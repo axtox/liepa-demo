@@ -19,17 +19,14 @@ namespace LiepaService.Controllers
         }
 
         [HttpGet]
-        //[Route("[controller]/[action]")]
-        public async Task<ObjectResult> UserInfo()
+        [Route("public/[action]/{id}")]
+        public async Task<IActionResult> UserInfo(int id)
         {
-            //_context.
-            var df = _context.Users.First();
-            var statise = await _context.UserStatuses.ToListAsync();
-            var users = await _context.Users.ToListAsync();
+            var user = await _context.Users.FindAsync(id);
+            if(user == null)
+                return BadRequest();
 
-            var p =users[0].Status.Value;
-            //var dfd = _context.UserStatuses.Where(p => p.StatusId == df.StatusId);
-            return Ok(users);
+            return Ok(user);
         }
     }
 }
