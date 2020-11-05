@@ -1,24 +1,14 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using System.Xml.Serialization;
 using LiepaService.Models;
+using LiepaService.Models.Views;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using LiepaService.Services;
 
 namespace LiepaService.Controllers
 {
-    [XmlRoot("User")]
-    public class UserView { 
-        [XmlAttribute]
-        public int Id {get;set;}
-        [XmlAttribute]
-        public string Name {get;set;}
-        public string Status {get;set;}
-    }
     [XmlRoot("Response")]
     [XmlType(IncludeInSchema = false, AnonymousType = true)]
     public class ResponseResult  {
@@ -36,11 +26,11 @@ namespace LiepaService.Controllers
     public class LiepaDemoController : ControllerBase
     {
         private readonly ILogger<LiepaDemoController> _logger;
-        private readonly LiepaDemoDatabaseContext _context;
-        public LiepaDemoController(ILogger<LiepaDemoController> logger, LiepaDemoDatabaseContext context)
+        private readonly IDatabaseAccessService _databaseService;
+        public LiepaDemoController(ILogger<LiepaDemoController> logger, IDatabaseAccessService databaseService)
         {
             _logger = logger;
-            _context = context;
+            _databaseService = databaseService;
         }
 
         [HttpGet]
@@ -48,16 +38,10 @@ namespace LiepaService.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> UserInfo(int id)
         {
-            var user = await _context.Users.FindAsync(id);
+            //var user = await _databaseService.Users.FindAsync(id);
            /* if(user == null)
                 return BadRequest();*/
-//var ok = Ok(user);
-            return Ok (new ResponseResult { 
-                User = new UserView {
-                Id = user.UserId,
-                Name = user.Name,
-                Status = user.Status.Value
-            }});
+            return Ok();
         }
 
         [HttpPut]
