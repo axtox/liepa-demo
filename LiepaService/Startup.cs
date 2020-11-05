@@ -8,6 +8,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Pomelo.EntityFrameworkCore.MySql.Storage;
 using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
+using Microsoft.Net.Http.Headers;
+using Microsoft.AspNetCore.Mvc.Formatters;
+using LiepaService.Handlers;
+using Microsoft.AspNetCore.Authentication;
+using LiepaService.Services;
 
 namespace LiepaService
 {
@@ -21,11 +26,19 @@ namespace LiepaService
         public IConfiguration Configuration { get; }
 
         public void ConfigureServices(IServiceCollection services)
-        {            
+        {
+
             services.AddDbContext<LiepaDemoDatabaseContext>(opt =>
-               opt.UseMySql(Configuration.GetConnectionString("DefaultConnection"), mysqlOptions =>      
+               opt.UseLazyLoadingProxies().UseMySql(Configuration.GetConnectionString("DefaultConnection"), mysqlOptions =>      
                         mysqlOptions.ServerVersion(new ServerVersion(new Version(10, 1, 37), ServerType.MariaDb))));
-            services.AddControllers();
+            
+            services.AddControllers().
+                AddXmlSerializerFormatters();
+
+            services.AddAuthentication("BasicAuthentication")
+                .AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>("BasicAuthentication", null);
+
+            services.AddScoped<ILiepaAuthenticationService, LiepaAuthenticationService>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -35,10 +48,9 @@ namespace LiepaService
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseHttpsRedirection();
-
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
