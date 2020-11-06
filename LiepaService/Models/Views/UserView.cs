@@ -9,6 +9,7 @@ namespace LiepaService.Models.Views {
         public string Name {get;set;}
         public string Status {get;set;}
 
+        public UserView() {}
         public UserView(User user) {
             Id = user.UserId;
             Name = user.Name;

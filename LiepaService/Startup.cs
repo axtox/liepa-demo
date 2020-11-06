@@ -39,8 +39,9 @@ namespace LiepaService
                 .AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>("BasicAuthentication", null);
 
             services.AddMemoryCache();
+            
             services.AddScoped<ILiepaAuthenticationService, LiepaAuthenticationService>();
-            services.AddScoped<IDatabaseAccessService, CachedDatabaseAccessService>();
+            services.AddScoped<IUserDatabaseAccessService, CachedUserDatabaseAccessService>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

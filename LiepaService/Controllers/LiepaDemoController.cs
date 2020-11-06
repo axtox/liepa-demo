@@ -26,34 +26,64 @@ namespace LiepaService.Controllers
     public class LiepaDemoController : ControllerBase
     {
         private readonly ILogger<LiepaDemoController> _logger;
-        private readonly IDatabaseAccessService _databaseService;
-        public LiepaDemoController(ILogger<LiepaDemoController> logger, IDatabaseAccessService databaseService)
+        private readonly IUserDatabaseAccessService _databaseService;
+        public LiepaDemoController(ILogger<LiepaDemoController> logger, IUserDatabaseAccessService databaseService)
         {
             _logger = logger;
             _databaseService = databaseService;
         }
 
         [HttpGet]
-        [Route("public/[action]/{id}")]
+        [Route("public/[action]")]
         [AllowAnonymous]
-        public async Task<IActionResult> UserInfo(int id)
+        public async Task<IActionResult> UserInfo([FromQuery(Name = "id")] int id)
         {
-            //var user = await _databaseService.Users.FindAsync(id);
-           /* if(user == null)
-                return BadRequest();*/
-            return Ok();
+            var user = await _databaseService.Get(id);
+            return Ok(new UserView(user));
         }
 
-        [HttpPut]
+        [HttpPost]//[HttpPut]
         [Route("auth/[action]")]
-        public async Task<IActionResult> CreateUser()
+        public async Task<IActionResult> CreateUser(RequestView requestView)
         {
-            /*if(newUser == null)
-                return NoContent();*/
+            if(requestView.User == null)
+                return NoContent();
 
-            return Created("", null );
+            var userStatus = await _databaseService.GetStatus(requestView.User.Status);
+            var user = new User {
+                UserId = requestView.User.Id,
+                Name = requestView.User.Name,
+                StatusId = userStatus.StatusId
+            };
+
+            var createdUser = await _databaseService.Put(user);
+
+            return Created("", new UserView(createdUser) );
         }
 
+        [HttpPost]//[HttpDelete]
+        [Route("auth/[action]")]
+        public async Task<IActionResult> RemoveUser(RemovedUserView removedUserView)
+        {
+            var removedUser = await _databaseService.Delete(removedUserView.Id);
+
+            return Ok(new UserView(removedUser) );
+        }
+
+        [HttpPost]//[HttpDelete]
+        [Route("auth/[action]")]
+        public async Task<IActionResult> SetStatus(int id, string newStatus)
+        {
+            var user = await _databaseService.Get(id);
+
+            var status = await _databaseService.GetStatus(newStatus);
+
+            user.StatusId = status.StatusId;
+
+            var userWithUpdatedStatus = await _databaseService.Update(user);
+
+            return Ok(new UserView(userWithUpdatedStatus));
+        }
         /*private ResponseResult ResponseResult(User user) {
             return new ResponseResult(new UserView {
                 Id = user.UserId,
