@@ -1,5 +1,4 @@
 ﻿using System.Threading.Tasks;
-using System.Xml.Serialization;
 using LiepaService.Models;
 using LiepaService.Models.Views;
 using Microsoft.AspNetCore.Authorization;
@@ -9,18 +8,6 @@ using LiepaService.Services;
 
 namespace LiepaService.Controllers
 {
-    [XmlRoot("Response")]
-    [XmlType(IncludeInSchema = false, AnonymousType = true)]
-    public class ResponseResult  {
-  
-        [XmlAttribute]
-        public bool Success {get; set;}
-        
-        [XmlAttribute]
-        public int ErrorId { get; set;}
-        public UserView User{ get; set;}
-    }
-
     [ApiController]
     [Authorize]
     public class LiepaDemoController : ControllerBase
@@ -63,33 +50,27 @@ namespace LiepaService.Controllers
 
         [HttpPost]//[HttpDelete]
         [Route("auth/[action]")]
-        public async Task<IActionResult> RemoveUser(RemovedUserView removedUserView)
+        public async Task<IActionResult> RemoveUser(DeleteRequestView removedUserView)
         {
-            var removedUser = await _databaseService.Delete(removedUserView.Id);
+            var removedUser = await _databaseService.Delete(removedUserView.RemoveUser.Id);
 
             return Ok(new UserView(removedUser) );
         }
 
-        [HttpPost]//[HttpDelete]
+        [HttpPost]//[HttpPatch]
         [Route("auth/[action]")]
-        public async Task<IActionResult> SetStatus(int id, string newStatus)
+        public async Task<IActionResult> SetStatus([FromForm]int id, [FromForm]string newStatus)
         {
             var user = await _databaseService.Get(id);
 
             var status = await _databaseService.GetStatus(newStatus);
 
             user.StatusId = status.StatusId;
+            user.Status = status;
 
             var userWithUpdatedStatus = await _databaseService.Update(user);
 
             return Ok(new UserView(userWithUpdatedStatus));
         }
-        /*private ResponseResult ResponseResult(User user) {
-            return new ResponseResult(new UserView {
-                Id = user.UserId,
-                Name = user.Name,
-                Status = user.Status.Value
-            });
-        }*/
     }
 }

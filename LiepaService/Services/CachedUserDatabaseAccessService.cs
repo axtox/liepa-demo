@@ -20,7 +20,7 @@ namespace LiepaService.Services {
         private readonly LiepaDemoDatabaseContext _databaseContext;
 
         public CachedUserDatabaseAccessService(IMemoryCache cache, LiepaDemoDatabaseContext databaseContext) : 
-                                        this(cache, databaseContext, TimeSpan.FromMinutes(1)) {}
+                                        this(cache, databaseContext, TimeSpan.FromMinutes(10)) {}
 
         public CachedUserDatabaseAccessService(IMemoryCache cache, LiepaDemoDatabaseContext databaseContext, TimeSpan cacheExpirationTime) {
             _cache = cache;
@@ -48,15 +48,15 @@ namespace LiepaService.Services {
 
         public async Task<User> Delete(int id)
         {
-            var removedUser = await Get(id);
+            var existedUser = await Get(id);
 
-            _databaseContext.Users.Remove(removedUser);
+            var removedUser = _databaseContext.Users.Remove(existedUser);
 
             await _databaseContext.SaveChangesAsync();
 
             _cache.Remove(id);
 
-            return removedUser;
+            return removedUser.Entity;
         }
 
         public async Task<User> Put(User newUser)
@@ -76,15 +76,17 @@ namespace LiepaService.Services {
 
         public async Task<User> Update(User updatedUser)
         {
-            var removedUser = await Get(updatedUser.UserId);
-            if(removedUser == null)
+            var existedUser = await Get(updatedUser.UserId);
+            if(existedUser == null)
                 throw new NoSuchEntityFoundException(updatedUser.UserId, $"Unable to update entity with id:{updatedUser.UserId}. There's no such user could be found");
 
             _cache.Remove(updatedUser.UserId);
 
             var user = _databaseContext.Users.Update(updatedUser);
 
-            _cache.Set(updatedUser.UserId, updatedUser, _cacheOptions);
+            await _databaseContext.SaveChangesAsync();
+
+            _cache.Set(user.Entity.UserId, user.Entity, _cacheOptions);
 
             return user.Entity;
         }
