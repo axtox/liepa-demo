@@ -8,7 +8,7 @@
             "name": ".NET Core Launch (web)",
             "type": "coreclr",
             "request": "launch",
-            "preLaunchTask": "build",
+            "preLaunchTask": "buildService",
             "program": "${workspaceFolder}/LiepaService/bin/Debug/netcoreapp3.1/LiepaService.dll",
             "args": [],
             "cwd": "${workspaceFolder}/LiepaService",
@@ -19,6 +19,16 @@
             "sourceFileMap": {
                 "/Views": "${workspaceFolder}/Views"
             }
+        },
+        {
+            "name": ".NET Core Console",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "buildClient",
+            "program": "${workspaceRoot}/LiepaServiceClient/bin/Debug/netcoreapp3.1/LiepaServiceClient.dll",
+            "args": ["-c", "24", "Bakunin", "New"],
+            "cwd": "${workspaceRoot}/LiepaServiceClient",
+            "stopAtEntry": false
         },
         {
             "name": ".NET Core Attach",

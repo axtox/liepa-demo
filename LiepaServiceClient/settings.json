@@ -1,0 +1,4 @@
+{
+    "serverAddress" : "http://159.69.241.123:5000",
+    "basicAuthCredentials" : "master:42"
+}
