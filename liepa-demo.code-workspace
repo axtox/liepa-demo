@@ -231,12 +231,7 @@
 			"**/*.msp": true,
 			"**/*.lnk": true,
 			"**/.idea/": true,
-			"**/*.sln.iml": true,
-			".vscode/*": true,
-			".vscode/settings.json": false,
-			".vscode/tasks.json": false,
-			".vscode/launch.json": false,
-			".vscode/extensions.json": false
+			"**/*.sln.iml": true
 		},
 		"cSpell.words": [
 			"Liepa"
