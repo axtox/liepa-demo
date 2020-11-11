@@ -14,6 +14,15 @@ namespace LiepaServiceClient
         private static HttpClient Client = new HttpClient();
         static async Task Main(string[] args)
         {
+            if(args.Length == 0) {
+                Console.WriteLine("Usage: \n" +
+                                    "\t-c, --create <id> <name> <status>: Create a new user, using  provided info\n" +
+                                    "\t-r, --read <int>: Find user by id\n" +
+                                    "\t-u, --update <id> <status>: Set new status to a user\n" +
+                                    "\t-d, --delete <id>: Delete user by id\n");
+                return;
+            }
+
             ConfigureClient();
 
             switch(args[0]) {
@@ -39,10 +48,10 @@ namespace LiepaServiceClient
                 }
                 default : {
                     Console.WriteLine("Usage: \n" +
-                                    "-c, --create <id> <name> <status>: Create a new user, using  provided info" +
-                                    "-r, --read <int>: Find user by id" +
-                                    "-u, --update <id> <status>: Set new status to a user" +
-                                    "-d, --delete <id>: Delete user by id");
+                                    "\t-c, --create <id> <name> <status>: Create a new user, using  provided info\n" +
+                                    "\t-r, --read <int>: Find user by id\n" +
+                                    "\t-u, --update <id> <status>: Set new status to a user\n" +
+                                    "\t-d, --delete <id>: Delete user by id\n");
                     return;
                 }
             }
